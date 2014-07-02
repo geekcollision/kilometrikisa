@@ -12,6 +12,7 @@
     "start": "node ./serve.js"
   },
   "dependencies": {
+    "annomath": "^0.3.2",
     "cheerio": "0.12.4",
     "express": "3.4.7",
     "log-timestamp": "^0.1.1",
