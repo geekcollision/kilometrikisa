@@ -1,8 +1,11 @@
 'use strict';
 
+var async = require('async');
 var spyder = require('spyder');
 var sugar = require('object-sugar');
 
+var indexer = require('../lib/indexer');
+var scraper = require('../lib/scraper');
 var Team = require('../schemas').Team;
 
 
@@ -16,19 +19,26 @@ function scrape(cb) {
             cb();
         },
         indexer: function(o, cb) {
-            // TODO
-            cb(null, []);
+            indexer(cb);
         },
         scraper: function(o, url, cb) {
-            // TODO
-            cb();
+            scraper(url, cb);
         },
         onError: function(o, err) {
             cb(err);
         },
-        onResult: function(o, job, cb) {
-            // TODO: write to db
-            cb();
+        onResult: function(o, teams, cb) {
+            async.each(teams, function(team, cb) {
+                sugar.getOrCreate(Team, {
+                    name: team.name
+                }, function(err, d) {
+                    if(err) {
+                        return cb(err);
+                    }
+
+                    sugar.update(Team, d._id, team, cb);
+                });
+            }, cb);
         },
         onFinish: function() {
             console.log('Updated data');
